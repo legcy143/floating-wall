@@ -81,7 +81,7 @@ const Page: React.FC = () => {
         <img src={welcome.src} className="welcome" alt="Welcome" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }} />
       )}
       {!showWelcome && lamps.slice(0, renderIndex).map((lamp: any, i: number) => (
-        lamp.name && lamp.feedback && <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
+         <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
       ))}
     </div>
   );
