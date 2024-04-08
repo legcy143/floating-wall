@@ -38,6 +38,7 @@ const Page: React.FC = () => {
     const getLamps = async () => {
       const res = await axios.get("https://api.gokapturehub.com/wall-test");
       setLamps(res.data.data);
+      console.log(res.data.data)
     };
 
     getLamps();
@@ -69,7 +70,7 @@ const Page: React.FC = () => {
         <img src={welcome.src} className="welcome" alt="Welcome" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }} />
       )}
       {!showWelcome && lamps.map((lamp: any, i: number) => (
-        <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
+        lamp.name && lamp.feedback && <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
       ))}
     </div>
   );
