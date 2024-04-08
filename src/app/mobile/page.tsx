@@ -143,8 +143,8 @@ export default function Mobile() {
             </div>
           </section>
           {/* content goes here */}
-          <CardFooter className="flex flex-row items-center justify-end gap-2 py-2">
-            <Button onClick={handleSubmit}>Send feedback</Button>
+          <CardFooter className="flex flex-row items-center justify-center gap-2 py-2">
+            <Button onClick={handleSubmit}>Share</Button>
           </CardFooter>
         </CardContent>
       </Card>
