@@ -61,8 +61,9 @@ export default function Lamp(data: LampProps) {
         <div className=" tracking-wider text-2xl font-bold">
           {data.name?.toUpperCase()}
         </div>
-        <div className="text-lg   ">{data.feedback}</div>
+        <div className="text-lg">{data.feedback}</div>
       </div>
+      <img src="https://cdnl.iconscout.com/lottie/premium/thumb/fire-7970677-6356283.gif" className="absolute rotate-180 w-56 top-44 left-8" />
     </div>
   );
 }
