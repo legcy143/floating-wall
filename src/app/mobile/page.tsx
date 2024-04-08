@@ -14,15 +14,17 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import React, { useEffect, useRef, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 
 import io from "socket.io-client";
+import { TiArrowSortedDown } from "react-icons/ti";
 
 const socket = io("https://mosaic-api.gokapturehub.com", {
   transports: ["websocket"],
@@ -33,15 +35,31 @@ interface FormDataTypes {
   feedback: string;
 }
 
+const feedbackOptions = [
+  "Excited",
+  "Top of the World",
+  "Inspired",
+  "WOWed",
+  "Colorful",
+  "Vibrant",
+  "Bold",
+  "Brave",
+  "Dynamic",
+  "Thrilled",
+  "New",
+  "Energetic",
+  "Radiant",
+  "Lively",
+];
+
 export default function Mobile() {
-  const [feedbackOption, setFeedbackOption] = useState('Select');
   const [formData, setFormData] = useState<FormDataTypes>({
     name: "",
-    feedback: "",
+    feedback: feedbackOptions[0],
   });
   let maxLength = {
     name: 10,
-  }
+  };
 
   function handleOnChange(key: string, value: string) {
     if (value.length > maxLength.name && key == "name") {
@@ -53,17 +71,7 @@ export default function Mobile() {
     }));
   }
 
-  useEffect(()=>{
-    setFormData({...formData, feedback:feedbackOption});
-    console.log(formData);
-  },[feedbackOption]);
-  useEffect(()=>{
-    console.log(formData);
-  },[formData]);
-
-
   const handleSubmit = async () => {
-
     console.log(formData);
     if (formData.name.length === 0 && formData.feedback.length === 0) {
       toast.warning("All fields are required");
@@ -74,7 +82,7 @@ export default function Mobile() {
     toast.success("form submited");
     setFormData({
       name: "",
-      feedback: "",
+      feedback: feedbackOptions[0],
     });
   };
   return (
@@ -100,43 +108,33 @@ export default function Mobile() {
                 value={formData.name}
                 onChange={(e) => handleOnChange("name", e.target.value)}
               />
-              <span className="text-xs text-end w-full block m-1 ml-0">{formData.name.length}/{maxLength.name}</span>
+              <span className="text-xs text-end w-full block m-1 ml-0">
+                {formData.name.length}/{maxLength.name}
+              </span>
             </div>
-            {/* <div>
-              <Label>
-                Feedback <span className="text-red-500">*</span>
-              </Label>
-              <Textarea
-                placeholder="Feedback . . ."
-                value={formData.feedback}
-                onChange={(e) => handleOnChange("feedback", e.target.value)}
-              />
-                <span className="text-xs text-end w-full block m-1 ml-0">{formData.feedback.length}/{maxLength.feedback}</span>
-            </div> */}
+
             <div className="flex gap-x-2 items-center">
               <p>I'm Feeling </p>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline">{feedbackOption}</Button>
+                  <Button variant="outline">{formData.feedback}<TiArrowSortedDown className="ml-3"/></Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 h-full">
                   <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup defaultValue={feedbackOption} onValueChange={setFeedbackOption}>
-                    <DropdownMenuRadioItem value="Excited">Excited</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Top of the World">Top of the World</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Inspired">Inspired</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="WOWed">WOWed</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Colorful">Colorful</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Vibrant">Vibrant</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Bold">Bold</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Brave">Brave</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Dynamic">Dynamic</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Thrilled">Thrilled</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="New">New</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Energetic">Energetic</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Radiant">Radiant</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Lively">Lively</DropdownMenuRadioItem>
+                  <DropdownMenuRadioGroup
+                    className="p-2 max-h-[40vh] overflow-y-auto md:scroll-m-10"
+                    defaultValue={formData.feedback}
+                    onValueChange={(e) => {
+                      handleOnChange("feedback", e);
+                      console.log(e);
+                    }}
+                  >
+                    {feedbackOptions?.map((e) => (
+                      <DropdownMenuRadioItem key={e} value={e}>
+                        {e}
+                      </DropdownMenuRadioItem>
+                    ))}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
