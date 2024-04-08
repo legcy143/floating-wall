@@ -6,6 +6,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,20 +41,17 @@ interface FormDataTypes {
 }
 
 export default function Mobile() {
+  const [feedbackOption, setFeedbackOption] = useState('Select');
   const [formData, setFormData] = useState<FormDataTypes>({
     name: "",
     feedback: "",
   });
   let maxLength = {
-    name:10,
-    feedback:20,
+    name: 10,
   }
 
-  function handleOnChange(key: string, value:string) {
-    if(value.length > maxLength.feedback && key == "feedback"){
-      return;
-    }
-    if(value.length > maxLength.name && key == "name"){
+  function handleOnChange(key: string, value: string) {
+    if (value.length > maxLength.name && key == "name") {
       return;
     }
     setFormData((prev) => ({
@@ -47,7 +60,18 @@ export default function Mobile() {
     }));
   }
 
+  useEffect(()=>{
+    setFormData({...formData, feedback:feedbackOption});
+    console.log(formData);
+  },[feedbackOption]);
+  useEffect(()=>{
+    console.log(formData);
+  },[formData]);
+
+
   const handleSubmit = async () => {
+
+    console.log(formData);
     if (formData.name.length === 0 && formData.feedback.length === 0) {
       toast.warning("All fields are required");
       return;
@@ -85,7 +109,7 @@ export default function Mobile() {
               />
               <span className="text-xs text-end w-full block m-1 ml-0">{formData.name.length}/{maxLength.name}</span>
             </div>
-            <div>
+            {/* <div>
               <Label>
                 Feedback <span className="text-red-500">*</span>
               </Label>
@@ -95,6 +119,34 @@ export default function Mobile() {
                 onChange={(e) => handleOnChange("feedback", e.target.value)}
               />
                 <span className="text-xs text-end w-full block m-1 ml-0">{formData.feedback.length}/{maxLength.feedback}</span>
+            </div> */}
+            <div className="flex gap-x-2 items-center">
+              <p>I'm Feeling </p>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">{feedbackOption}</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 h-full">
+                  <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup defaultValue={feedbackOption} onValueChange={setFeedbackOption}>
+                    <DropdownMenuRadioItem value="Excited">Excited</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Top of the World">Top of the World</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Inspired">Inspired</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="WOWed">WOWed</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Colorful">Colorful</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Vibrant">Vibrant</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Bold">Bold</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Brave">Brave</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Dynamic">Dynamic</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Thrilled">Thrilled</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="New">New</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Energetic">Energetic</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Radiant">Radiant</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Lively">Lively</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </section>
           {/* content goes here */}
