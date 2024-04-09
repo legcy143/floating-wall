@@ -26,6 +26,7 @@ import { IoIosSend } from "react-icons/io";
 
 import io from "socket.io-client";
 import { TiArrowSortedDown } from "react-icons/ti";
+import feedbackOptions from "@/utils/feedbackOptions";
 
 const socket = io("https://mosaic-api.gokapturehub.com", {
   transports: ["websocket"],
@@ -36,22 +37,6 @@ interface FormDataTypes {
   feedback: string;
 }
 
-const feedbackOptions = [
-  "Excited",
-  "Top of the World",
-  "Inspired",
-  "WOWed",
-  "Colorful",
-  "Vibrant",
-  "Bold",
-  "Brave",
-  "Dynamic",
-  "Thrilled",
-  "New",
-  "Energetic",
-  "Radiant",
-  "Lively",
-];
 
 export default function Mobile() {
   const [formData, setFormData] = useState<FormDataTypes>({

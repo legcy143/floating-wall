@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import gsap from "gsap";
+import feedbackOptions from "@/utils/feedbackOptions";
 const socket = io("https://mosaic-api.gokapturehub.com", {
   transports: ["websocket"],
 });
@@ -47,8 +48,8 @@ const Page: React.FC = () => {
 
     timer = setInterval(() => {
       const randomLamps = Array.from({ length: 2 }, () => ({
-        feedback: "",
-        name: "",
+        name: "me",
+        feedback: feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)],
       }));
       setLamps((prevLamps: any) => [...prevLamps, ...randomLamps]);
     }, 10000);
