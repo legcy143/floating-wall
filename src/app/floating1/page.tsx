@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import gsap from "gsap";
-import welcome from "../../../public/assets/welcom.png";
 const socket = io("https://mosaic-api.gokapturehub.com", {
   transports: ["websocket"],
 });
@@ -12,7 +11,7 @@ const socket = io("https://mosaic-api.gokapturehub.com", {
 const Page: React.FC = () => {
   const [lamps, setLamps] = useState<any>([]);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [renderIndex, setRenderIndex] = useState(0); 
+  const [renderIndex, setRenderIndex] = useState(0);
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -61,7 +60,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     if (showWelcome) {
-      gsap.fromTo(".welcome", { y: "100%" }, { y: "0%", duration: 5, ease: "power3.out" });
+      gsap.fromTo(".welcome", { y: "100%", opacity: 0, filter: "blur(100px)" }, { y: "0%", opacity: 1, filter: "blur(0px)", duration: 5, ease: "power3.out" });
     }
   }, [showWelcome]);
 
@@ -69,8 +68,8 @@ const Page: React.FC = () => {
     if (!showWelcome) {
       const timeout = setTimeout(() => {
         setRenderIndex((prevIndex) => prevIndex + 1);
-      }, 1000); 
-  
+      }, 1000);
+
       return () => clearTimeout(timeout);
     }
   }, [renderIndex, showWelcome]);
@@ -81,7 +80,7 @@ const Page: React.FC = () => {
         <img src={"./assets/event-welcome.jpg"} className="welcome bg-[var(--event-theme)] object-cover" alt="Welcome" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }} />
       )}
       {!showWelcome && lamps.slice(0, renderIndex).map((lamp: any, i: number) => (
-         <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
+        <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
       ))}
     </div>
   );
