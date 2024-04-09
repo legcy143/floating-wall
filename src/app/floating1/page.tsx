@@ -78,7 +78,7 @@ const Page: React.FC = () => {
   return (
     <div className="flex justify-center items-center h-screen bg-cover bg-[url('/assets/bg.png')] relative overflow-hidden">
       {showWelcome && (
-        <img src={welcome.src} className="welcome" alt="Welcome" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }} />
+        <img src={"./assets/event-welcome.jpg"} className="welcome bg-[var(--event-theme)] object-cover" alt="Welcome" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }} />
       )}
       {!showWelcome && lamps.slice(0, renderIndex).map((lamp: any, i: number) => (
          <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />

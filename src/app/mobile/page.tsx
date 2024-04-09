@@ -86,12 +86,14 @@ export default function Mobile() {
     });
   };
   return (
-    <main className="w-screen h-screen flex relative">
-      <img
-        src="./assets/bg.png"
-        alt=""
-        className="fixed top-0 right-0 w-screen h-screen z-[-1] object-cover"
-      />
+    <main className="w-screen max-h-[100vh] h-[100dvh] flex relative"
+    style={{
+      backgroundImage: "url(./assets/bg.png)",
+      backgroundOrigin: "center center",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      backgroundPosition: "center", 
+    }}>
       <Card className="w-[90%] max-w-[25rem] m-auto z-10">
         <CardContent className="">
           <CardHeader>

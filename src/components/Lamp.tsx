@@ -63,7 +63,7 @@ export default function Lamp(data: LampProps) {
         </div>
         <div className="text-lg">{data.feedback}</div>
       </div>
-      <img src="https://cdnl.iconscout.com/lottie/premium/thumb/fire-7970677-6356283.gif" className="absolute rotate-180 w-56 top-44 left-8" />
+      {/* <img src="https://cdnl.iconscout.com/lottie/premium/thumb/fire-7970677-6356283.gif" className="absolute rotate-180 w-56 top-44 left-8 opacity-75" /> */}
     </div>
   );
 }
