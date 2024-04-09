@@ -173,7 +173,7 @@ export default function Mobile() {
                   <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuRadioGroup
-                    className="p-2 max-h-[40vh] overflow-y-auto md:scroll-m-10"
+                    className="p-2 max-h-[35vh] overflow-y-auto"
                     defaultValue={formData.feedback}
                     onValueChange={(e) => {
                       handleOnChange("feedback", e);
