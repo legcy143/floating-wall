@@ -48,7 +48,7 @@ const Page: React.FC = () => {
 
     timer = setInterval(() => {
       const randomLamps = Array.from({ length: 2 }, () => ({
-        name: "me",
+        name: "",
         feedback: feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)],
       }));
       setLamps((prevLamps: any) => [...prevLamps, ...randomLamps]);
