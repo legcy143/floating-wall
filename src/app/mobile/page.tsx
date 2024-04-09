@@ -147,7 +147,7 @@ export default function Mobile() {
           </section> */}
 
           {/* new update */}
-          <section className="flex flex-col gap-2">
+          <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <Label className="w-20">
                 Name <span className="text-red-500">*</span>
@@ -159,7 +159,7 @@ export default function Mobile() {
                 onChange={(e) => handleOnChange("name", e.target.value)}
                 />
                 </div>
-              <span className="text-xs text-end w-full block ml-0 mt-[-0.5rem]">
+              <span className="text-xs text-end w-full block ml-0 mt-[-0.7rem]">
                 {formData.name.length}/{maxLength.name}
               </span>
 
