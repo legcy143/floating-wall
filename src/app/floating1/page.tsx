@@ -38,20 +38,20 @@ const Page: React.FC = () => {
 
     getLamps();
 
-    let timer: NodeJS.Timeout;
+    // let timer: NodeJS.Timeout;
 
-    timer = setInterval(() => {
-      const randomLamps = Array.from({ length: 2 }, () => ({
-        name: "",
-        feedback:
-          feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)],
-      }));
-      setLamps((prevLamps: any) => [...prevLamps, ...randomLamps]);
-    }, 10000);
+    // timer = setInterval(() => {
+    //   const randomLamps = Array.from({ length: 2 }, () => ({
+    //     name: "",
+    //     feedback:
+    //       feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)],
+    //   }));
+    //   setLamps((prevLamps: any) => [...prevLamps, ...randomLamps]);
+    // }, 10000);
 
-    return () => {
-      clearTimeout(timer);
-    };
+    // return () => {
+    //   clearTimeout(timer);
+    // };
   }, []);
 
   useEffect(() => {
