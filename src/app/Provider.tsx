@@ -4,7 +4,7 @@ import React from 'react'
 export default function Provider({children}:any) {
   return (
     <>
-    <Toaster/>
+    <Toaster position='top-center'/>
     {children}
     </>
   )

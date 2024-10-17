@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Logo from "../../../public/assets/logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,8 +28,9 @@ import { IoIosSend } from "react-icons/io";
 import io from "socket.io-client";
 import { TiArrowSortedDown } from "react-icons/ti";
 import feedbackOptions from "@/utils/feedbackOptions";
+import axios from "axios";
 
-const socket = io("https://mosaic-api.gokapturehub.com", {
+const socket = io("https://api.gokapturehub.com", {
   transports: ["websocket"],
 });
 
@@ -37,12 +39,12 @@ interface FormDataTypes {
   feedback: string;
 }
 
-
 export default function Mobile() {
   const [formData, setFormData] = useState<FormDataTypes>({
     name: "",
     feedback: feedbackOptions[0],
   });
+
   let maxLength = {
     name: 10,
   };
@@ -58,33 +60,37 @@ export default function Mobile() {
   }
 
   const handleSubmit = async () => {
-    console.log(formData);
-    if (formData.name.length === 0 && formData.feedback.length === 0) {
+    if (formData.name.length === 0 || formData.feedback.length === 0) {
       toast.warning("All fields are required");
       return;
     }
 
     socket.emit("wall", formData);
-    toast.success("form submited");
+    await axios.post(
+      "http://localhost:8000/floating-wall",
+      formData
+    );
+    toast.success("Feedback shared successfully");
     setFormData({
       name: "",
       feedback: feedbackOptions[0],
     });
   };
+
   return (
-    <main className="w-screen max-h-[100vh] h-[100dvh] flex relative"
-    style={{
-      backgroundImage: "url(./assets/bg.png)",
-      backgroundOrigin: "center center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-      backgroundPosition: "center", 
-    }}>
+    <main
+      className="w-screen max-h-[100vh] h-[100dvh] flex justify-center items-center"
+      style={{
+        backgroundImage: "url(./assets/bg.png)",
+        backgroundOrigin: "center center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <Card className="w-[90%] max-w-[25rem] m-auto z-10">
-        <CardContent className="">
-          <CardHeader>
-            <CardTitle></CardTitle>
-          </CardHeader>
+        <CardContent className="p-3 flex justify-center items-center flex-col space-y-3">
+          <img src={Logo.src} alt="logo" className="w-44" />
           {/* content goes here */}
           {/* <section className="space-y-2 p-1 py-2 overflow-auto">
             <div>
@@ -138,21 +144,24 @@ export default function Mobile() {
                 Name <span className="text-red-500">*</span>
               </Label>
               <Input
-              className="flex-1"
+                className="flex-1"
                 placeholder=". . ."
                 value={formData.name}
                 onChange={(e) => handleOnChange("name", e.target.value)}
-                />
-                </div>
-              <span className="text-xs text-end w-full block ml-0 mt-[-0.7rem]">
-                {formData.name.length}/{maxLength.name}
-              </span>
+              />
+            </div>
+            <span className="text-xs text-end w-full block ml-0 mt-[-0.7rem]">
+              {formData.name.length}/{maxLength.name}
+            </span>
 
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Label className=" w-20">I'm Feeling </Label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className=" flex-1 justify-between">{formData.feedback}<TiArrowSortedDown className="ml-3"/></Button>
+                  <Button variant="outline" className=" flex-1 justify-between">
+                    {formData.feedback}
+                    <TiArrowSortedDown className="ml-3" />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-full h-full flex-1">
                   <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
@@ -173,11 +182,16 @@ export default function Mobile() {
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-                    </div>
+            </div>
           </section>
           {/* content goes here */}
           <CardFooter className="flex flex-row items-center justify-center gap-2 py-2 pt-7">
-            <Button className="px-14 gap-2 text-white bg-[--event-theme]"  onClick={handleSubmit}>Share</Button>
+            <Button
+              className="px-14 gap-2 text-white bg-[#3f0653]"
+              onClick={handleSubmit}
+            >
+              Share
+            </Button>
           </CardFooter>
         </CardContent>
       </Card>

@@ -1,19 +1,17 @@
-
 const feedbackOptions = [
-    "Excited",
-    "Top of the World",
-    "Inspired",
-    "WOWed",
-    "Colorful",
-    "Vibrant",
-    "Bold",
-    "Brave",
-    "Dynamic",
-    "Thrilled",
-    "New",
-    "Energetic",
-    "Radiant",
-    "Lively",
-  ];
+  "Thrilled",
+  "Pumped",
+  "Energized",
+  "Ecstatic",
+  "Elated",
+  "Overjoyed",
+  "Eager",
+  "Hyped",
+  "Enthusiastic",
+  "Fired up",
+  "Ready to roll",
+  "Bursting with energy",
+  "Powerful",
+];
 
-export default feedbackOptions
+export default feedbackOptions;

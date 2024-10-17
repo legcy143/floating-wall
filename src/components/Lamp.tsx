@@ -9,7 +9,7 @@ const lampImages = [
 ];
 
 function randomXaxis() {
-  return Math.random() * 90;
+  return Math.random() * Date.now() % 100 - 0.5;
 }
 
 type LampProps = {
@@ -58,10 +58,10 @@ export default function Lamp(data: LampProps) {
       }}
     >
       <div className=" mb-8 flex flex-col justify-center items-center">
-        <div className=" tracking-wider text-2xl font-bold">
+        <p className="text-white tracking-wider text-2xl font-bold">
           {data.name?.toUpperCase()}
-        </div>
-        <div className="text-lg">{data.feedback}</div>
+        </p>
+        <div className="text-lg text-white">{data.feedback}</div>
       </div>
       {/* <img src="https://cdnl.iconscout.com/lottie/premium/thumb/fire-7970677-6356283.gif" className="absolute rotate-180 w-56 top-44 left-8 opacity-75" /> */}
     </div>
