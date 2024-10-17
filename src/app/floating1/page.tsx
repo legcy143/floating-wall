@@ -31,7 +31,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     const getLamps = async () => {
-      const res = await axios.get("http://localhost:8000/floating-wall");
+      const res = await axios.get("https://api.gokapturehub.com/floating-wall");
       setLamps(res.data);
       console.log(res.data);
     };

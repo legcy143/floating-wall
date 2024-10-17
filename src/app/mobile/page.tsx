@@ -67,7 +67,7 @@ export default function Mobile() {
 
     socket.emit("wall", formData);
     await axios.post(
-      "http://localhost:8000/floating-wall",
+      "https://api.gokapturehub.com/floating-wall",
       formData
     );
     toast.success("Feedback shared successfully");
