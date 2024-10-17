@@ -51,17 +51,17 @@ export default function Lamp(data: LampProps) {
   return (
     <div
       ref={divRef}
-      className="absolute text-white bottom-[-40vh]  flex flex-col justify-center items-center bg-cover h-[16rem] w-[13rem] "
+      className="absolute text-white bottom-[-45vh]  flex flex-col justify-center items-center bg-cover h-[8rem] w-[6.5rem]"
       style={{
         backgroundImage: `url(${lampImages[0]})`,
         left: `${randomXaxis()}vw`,
       }}
     >
-      <div className=" mb-8 flex flex-col justify-center items-center">
-        <p className="text-white tracking-wider text-2xl font-bold">
+      <div className="mb-8 flex flex-col justify-center items-center">
+        <p className="text-white tracking-wider text-[16px] font-bold text-clip">
           {data.name?.toUpperCase()}
         </p>
-        <div className="text-lg text-white">{data.feedback}</div>
+        <div className="text-[12px] text-white">{data.feedback}</div>
       </div>
       {/* <img src="https://cdnl.iconscout.com/lottie/premium/thumb/fire-7970677-6356283.gif" className="absolute rotate-180 w-56 top-44 left-8 opacity-75" /> */}
     </div>

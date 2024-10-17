@@ -10,7 +10,7 @@ const feedbackOptions = [
   "Enthusiastic",
   "Fired up",
   "Ready to roll",
-  "Bursting with energy",
+  // "Bursting with energy",
   "Powerful",
 ];
 
