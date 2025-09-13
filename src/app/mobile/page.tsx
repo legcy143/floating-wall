@@ -92,53 +92,6 @@ export default function Mobile() {
       <Card className="w-[90%] max-w-[25rem] m-auto z-10">
         <CardContent className="p-3 flex justify-center items-center flex-col space-y-3">
           <img src={Logo.src} alt="logo" className="w-44" />
-          {/* content goes here */}
-          {/* <section className="space-y-2 p-1 py-2 overflow-auto">
-            <div>
-              <div className="flex items-center">
-              <Label className="w-32 bg-green--500">
-                Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                placeholder="name"
-                value={formData.name}
-                onChange={(e) => handleOnChange("name", e.target.value)}
-              />
-              </div>
-              <span className="text-xs text-end w-full block m-1 ml-0">
-                {formData.name.length}/{maxLength.name}
-              </span>
-            </div>
-
-            <div className="flex gap-x-2 items-center bg-red-500">
-              <p className="w-32 bg-green-300">I'm Feeling </p>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">{formData.feedback}<TiArrowSortedDown className="ml-3"/></Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full h-full">
-                  <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup
-                    className="p-2 max-h-[40vh] overflow-y-auto md:scroll-m-10"
-                    defaultValue={formData.feedback}
-                    onValueChange={(e) => {
-                      handleOnChange("feedback", e);
-                      console.log(e);
-                    }}
-                  >
-                    {feedbackOptions?.map((e) => (
-                      <DropdownMenuRadioItem key={e} value={e}>
-                        {e}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </section> */}
-
-          {/* new update */}
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <Label className="w-20">

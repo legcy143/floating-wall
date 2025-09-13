@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import gsap from "gsap";
-import feedbackOptions from "@/utils/feedbackOptions";
 const socket = io(API_URL, {
   transports: ["websocket"],
 });
