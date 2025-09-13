@@ -19,7 +19,7 @@ export default function Home() {
             </CardTitle>
           </CardHeader>
           <Button onClick={()=>{router.push("/mobile")}} className="text-xl p-10">Mobile link</Button>
-          <Button onClick={()=>{router.push("/floating1")}}  className="text-xl p-10">Wall link</Button>
+          <Button onClick={()=>{router.push("/wall")}}  className="text-xl p-10">Wall link</Button>
         </CardContent>
       </Card>
     </main>

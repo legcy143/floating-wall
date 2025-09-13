@@ -29,8 +29,9 @@ import io from "socket.io-client";
 import { TiArrowSortedDown } from "react-icons/ti";
 import feedbackOptions from "@/utils/feedbackOptions";
 import axios from "axios";
+import { API_URL } from "@/constant/API_URL";
 
-const socket = io("https://api.gokapturehub.com", {
+const socket = io(API_URL, {
   transports: ["websocket"],
 });
 
@@ -67,7 +68,7 @@ export default function Mobile() {
 
     socket.emit("wall", formData);
     await axios.post(
-      "https://api.gokapturehub.com/floating-wall",
+      `${API_URL}/floating-wall`,
       formData
     );
     toast.success("Feedback shared successfully");

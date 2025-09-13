@@ -5,11 +5,12 @@ import io from "socket.io-client";
 import axios from "axios";
 import gsap from "gsap";
 import feedbackOptions from "@/utils/feedbackOptions";
-const socket = io("https://api.gokapturehub.com", {
+const socket = io(API_URL, {
   transports: ["websocket"],
 });
 
 import Logo from "../../../public/assets/logo.png";
+import { API_URL } from "@/constant/API_URL";
 
 const Page: React.FC = () => {
   const [lamps, setLamps] = useState<any>([]);
@@ -31,7 +32,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     const getLamps = async () => {
-      const res = await axios.get("https://api.gokapturehub.com/floating-wall");
+      const res = await axios.get(`${API_URL}/floating-wall`);
       setLamps(res.data);
       console.log(res.data);
     };
