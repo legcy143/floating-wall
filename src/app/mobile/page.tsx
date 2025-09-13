@@ -38,12 +38,14 @@ const socket = io(API_URL, {
 interface FormDataTypes {
   name: string;
   feedback: string;
+  userImage: string;
 }
 
 export default function Mobile() {
   const [formData, setFormData] = useState<FormDataTypes>({
     name: "",
     feedback: feedbackOptions[0],
+    userImage:"https://cdn-images.quenth.com/c5c9b77f-260e-481a-9906-80bfd29af005_Women-2.png",
   });
 
   let maxLength = {
@@ -75,6 +77,7 @@ export default function Mobile() {
     setFormData({
       name: "",
       feedback: feedbackOptions[0],
+      userImage:"",
     });
   };
 

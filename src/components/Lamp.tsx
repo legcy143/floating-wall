@@ -15,6 +15,7 @@ function randomXaxis() {
 type LampProps = {
   name?: string;
   feedback?: string;
+  userImage?: string;
 };
 
 export default function Lamp(data: LampProps) {
@@ -58,10 +59,14 @@ export default function Lamp(data: LampProps) {
       }}
     >
       <div className="mb-8 flex flex-col justify-center items-center">
+     
+        {
+          data.userImage && <img src={data.userImage} className="size-[2.5rem] rounded-full object-cover mb-1" alt="User" />
+        }
         <p className="text-white tracking-wider text-[13px] font-bold text-clip">
           {data.name?.toUpperCase()}
         </p>
-        <div className="text-[10px] text-white">{data.feedback}</div>
+        {/* <div className="text-[10px] text-white">{data.feedback}</div> */}
       </div>
       {/* <img src="https://cdnl.iconscout.com/lottie/premium/thumb/fire-7970677-6356283.gif" className="absolute rotate-180 w-56 top-44 left-8 opacity-75" /> */}
     </div>

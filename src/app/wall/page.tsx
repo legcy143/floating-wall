@@ -91,7 +91,7 @@ const Page: React.FC = () => {
         lamps
           .slice(0, renderIndex)
           .map((lamp: any, i: number) => (
-            <Lamp key={i} feedback={lamp.feedback} name={lamp.name} />
+            <Lamp key={i} feedback={lamp.feedback} name={lamp.name} userImage={lamp.userImage} />
           ))}
     </div>
   );
