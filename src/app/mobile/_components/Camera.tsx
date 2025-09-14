@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LuCamera, LuCheck, LuUpload } from 'react-icons/lu';
-import { MdOutlineKeyboardArrowLeft, MdOutlineRefresh } from 'react-icons/md';
+import { LuCamera, LuCheck, LuImagePlus, LuImages, LuSettings, LuUpload } from 'react-icons/lu';
+import { MdOutlineFlipCameraIos, MdOutlineKeyboardArrowLeft, MdOutlineRefresh } from 'react-icons/md';
 
 
 import { Button } from '@/components/ui/button';
 import { uploadSingleFile } from '@/utils/upload';
 
-interface CameraInterface{
+interface CameraInterface {
   image: string | null;
   setImage: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function Camera({image , setImage}:CameraInterface) {
+export default function Camera({ image, setImage }: CameraInterface) {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,7 +19,7 @@ export default function Camera({image , setImage}:CameraInterface) {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(false);
-  const [timerValue, setTimerValue] = useState(3);
+  const [timerValue, setTimerValue] = useState(0);
   const [countdown, setCountdown] = useState(0);
   const [cameraError, setCameraError] = useState<{
     label: string;
@@ -248,10 +248,8 @@ export default function Camera({image , setImage}:CameraInterface) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Clear any previous errors
     setCameraError(null);
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setCameraError({
         label: 'Invalid File Type',
@@ -260,7 +258,6 @@ export default function Camera({image , setImage}:CameraInterface) {
       return;
     }
 
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       setCameraError({
         label: 'File Too Large',
@@ -295,6 +292,40 @@ export default function Camera({image , setImage}:CameraInterface) {
     }
   };
 
+  const handleToggle = async () => {
+    const newFacingMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newFacingMode);
+    setIsMirrored(newFacingMode === 'user');
+    
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+    
+    try {
+      setIsLoading(true);
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 320 },
+          height: { ideal: 320 },
+          facingMode: newFacingMode,
+          aspectRatio: { ideal: 1 / 1 },
+        },
+      });
+
+      setStream(mediaStream);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+    } catch (error) {
+      console.error('Error switching camera:', error);
+      setFacingMode(facingMode);
+      setIsMirrored(facingMode === 'user');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const retakePhoto = async () => {
     setIsRetaking(true);
     setCapturedImage(null);
@@ -311,7 +342,6 @@ export default function Camera({image , setImage}:CameraInterface) {
       URL.revokeObjectURL(uploadedImage);
     }
 
-    // Only try to restart camera if permission was previously granted
     if (cameraPermission === 'granted') {
       try {
         await startCamera();
@@ -319,8 +349,6 @@ export default function Camera({image , setImage}:CameraInterface) {
         console.error('Error restarting camera:', error);
       }
     } else if (cameraPermission === 'denied') {
-      // If camera was denied but user had uploaded image, just clear the upload
-      // and let them choose again
       setCameraPermission('checking');
       await startCamera();
     }
@@ -349,10 +377,10 @@ export default function Camera({image , setImage}:CameraInterface) {
           </div>
         </div>
 
-        {/* Upload option when camera is not available */}
         <div className="space-y-4">
           <div className="flex flex-row justify-center">
             <Button
+              variant={"theme"}
               size={"icon"}
               onClick={handleUploadClick}
               disabled={isLoading}
@@ -459,6 +487,7 @@ export default function Camera({image , setImage}:CameraInterface) {
       {capturedImage || uploadedImage ? (
         <div className="flex flex-row gap-5 items-center justify-center">
           <Button
+            variant={"theme"}
             size={"icon"}
             onClick={retakePhoto}
             disabled={isRetaking}
@@ -466,6 +495,7 @@ export default function Camera({image , setImage}:CameraInterface) {
             <MdOutlineRefresh />
           </Button>
           <Button
+            variant={"theme"}
             size={"icon"}
             onClick={handleNextPage}
             disabled={isUploadLoading}
@@ -476,24 +506,35 @@ export default function Camera({image , setImage}:CameraInterface) {
       ) : (
         <div className="space-y-4">
           <div className="flex flex-row gap-5 items-center justify-center">
-            {/* Upload button first */}
             <Button
+              variant={"theme"}
               size={"icon"}
               onClick={handleUploadClick}
               disabled={isTimerActive || isLoading}
             >
-              <LuUpload />
+              <LuImages />
             </Button>
 
-            {/* Camera button - only show if camera permission is granted */}
             {cameraPermission === 'granted' && (
-              <Button
-                size={"icon"}
-                onClick={timerValue > 0 ? startTimerCapture : capturePhoto}
-                disabled={isTimerActive || isLoading}
-              >
-                <LuCamera />
-              </Button>
+              <>
+                <Button
+                  variant={"theme"}
+                  size={"icon"}
+                  className='text-white-500 size-16 rounded-full'
+                  onClick={timerValue > 0 ? startTimerCapture : capturePhoto}
+                  disabled={isTimerActive || isLoading}
+                >
+                  <LuCamera size={25} />
+                </Button>
+                <Button
+                  variant={"theme"}
+                  size={"icon"}
+                  onClick={handleToggle}
+                  disabled={isTimerActive || isLoading}
+                >
+                  <MdOutlineFlipCameraIos />
+                </Button>
+              </>
             )}
           </div>
           <div className="text-center text-sm text-gray-300">
@@ -508,7 +549,6 @@ export default function Camera({image , setImage}:CameraInterface) {
         </div>
       )}
 
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -518,11 +558,6 @@ export default function Camera({image , setImage}:CameraInterface) {
       />
 
       <canvas ref={canvasRef} className="hidden" />
-      {/* <div className="flex flex-row justify-between items-center">
-        <Button size={"icon"} onClick={GoPrevious}>
-          <MdOutlineKeyboardArrowLeft className="size-7" />
-        </Button>
-      </div> */}
     </section>
   );
 }
