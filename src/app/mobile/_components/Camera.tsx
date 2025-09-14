@@ -456,9 +456,11 @@ export default function Camera({ image, setImage }: CameraInterface) {
             <div className="relative w-full h-full flex items-center justify-center bg-gray-800">
               <div className="text-center text-white p-8">
                 <div className="text-4xl mb-4">📷</div>
-                <p className="text-sm text-gray-300">Camera not available</p>
+                <p className="text-sm text-gray-300">
+                  Unable to access the camera. Please verify your settings and grant the necessary permissions.
+                </p>
                 <p className="text-xs text-gray-400 mt-2">
-                  Use upload button below
+                   If you're having trouble with the camera, use the button below to upload an image instead.
                 </p>
               </div>
             </div>
