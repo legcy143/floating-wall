@@ -1,206 +1,528 @@
-'use client';
+import React, { useEffect, useRef, useState } from 'react';
+import { LuCamera, LuCheck, LuUpload } from 'react-icons/lu';
+import { MdOutlineKeyboardArrowLeft, MdOutlineRefresh } from 'react-icons/md';
 
-import React, { useRef, useState, useCallback } from 'react';
+
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { HiCamera, HiArrowPath, HiArrowRight } from 'react-icons/hi2';
+import { uploadSingleFile } from '@/utils/upload';
 
-export default function Camera() {
+interface CameraInterface{
+  image: string | null;
+  setImage: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export default function Camera({image , setImage}:CameraInterface) {
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  
-  const [isStreaming, setIsStreaming] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [timerValue, setTimerValue] = useState(3);
+  const [countdown, setCountdown] = useState(0);
+  const [cameraError, setCameraError] = useState<{
+    label: string;
+    body: string;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRetaking, setIsRetaking] = useState(false);
+  const [isMirrored, setIsMirrored] = useState(true);
+  const [isUploadLoading, setIsUploadLoading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedBlob, setUploadedBlob] = useState<Blob | null>(null);
+  const [cameraPermission, setCameraPermission] = useState<
+    'granted' | 'denied' | 'checking'
+  >('checking');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [videoDimensions, setVideoDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const [capturedDimensions, setCapturedDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+  const timerOptions = [
+    { value: 0, label: 'Instant', icon: '0' },
+    { value: 3, label: '3 seconds', icon: '3' },
+    { value: 5, label: '5 seconds', icon: '5' },
+    { value: 10, label: '10 seconds', icon: '10' },
+  ];
 
-  const startCamera = useCallback(async () => {
+  useEffect(() => {
+    startCamera();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+
+      const handleLoadedMetadata = () => {
+        if (videoRef.current) {
+          setVideoDimensions({
+            width: videoRef.current.videoWidth,
+            height: videoRef.current.videoHeight,
+          });
+        }
+      };
+
+      videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+      videoRef.current.load();
+      videoRef.current.play().catch(console.error);
+
+      return () => {
+        if (videoRef.current) {
+          videoRef.current.removeEventListener(
+            'loadedmetadata',
+            handleLoadedMetadata,
+          );
+        }
+      };
+    }
+  }, [stream, facingMode]);
+
+  const startCamera = async () => {
+    setIsLoading(true);
+    setCameraError(null);
+    setCameraPermission('checking');
+
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Stop any existing stream
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'environment' // Use back camera on mobile
-        }
+          width: { ideal: 320 },
+          height: { ideal: 320 },
+          facingMode: facingMode,
+          aspectRatio: { ideal: 1 / 1 },
+        },
       });
 
+      setStream(mediaStream);
+      setCameraPermission('granted');
+
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsStreaming(true);
+        videoRef.current.srcObject = mediaStream;
       }
-    } catch (err) {
-      setError('Camera access denied or not available');
-      console.error('Camera error:', err);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      setCameraPermission('denied');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setIsStreaming(false);
-  }, []);
-
-  const capturePhoto = useCallback(() => {
+  const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
 
-    const video = videoRef.current;
     const canvas = canvasRef.current;
+    const video = videoRef.current;
     const context = canvas.getContext('2d');
 
-    if (!context) return;
+    const displayWidth = video.clientWidth;
+    const displayHeight = video.clientHeight;
 
-    // Set canvas dimensions to match video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+    setCapturedDimensions({
+      width: displayWidth,
+      height: displayHeight,
+    });
 
-    // Draw the video frame to canvas
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    if (context) {
+      if (isMirrored) {
+        context.save();
+        context.scale(-1, 1);
+        context.drawImage(
+          video,
+          0,
+          0,
+          displayWidth,
+          displayHeight,
+          -displayWidth,
+          0,
+          displayWidth,
+          displayHeight,
+        );
+        context.restore();
+      } else {
+        context.drawImage(
+          video,
+          0,
+          0,
+          displayWidth,
+          displayHeight,
+          0,
+          0,
+          displayWidth,
+          displayHeight,
+        );
+      }
 
-    // Convert to base64
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
-    setCapturedImage(imageData);
-    stopCamera();
-  }, [stopCamera]);
-
-  const retryCapture = useCallback(() => {
-    setCapturedImage(null);
-    startCamera();
-  }, [startCamera]);
-
-  const handleNext = useCallback(() => {
-    if (capturedImage) {
-      // Here you can do whatever you want with the captured image
-      console.log('Image captured and ready to proceed:', capturedImage);
-      // For now, we'll just keep it in the component state
-      // In a real app, you might want to send it to a parent component or API
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            setCapturedBlob(blob);
+            const imageUrl = URL.createObjectURL(blob);
+            setCapturedImage(imageUrl);
+          }
+        },
+        'image/jpeg',
+        0.8,
+      );
     }
-  }, [capturedImage]);
+  };
 
-  // Cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, [stopCamera]);
+  const startTimerCapture = () => {
+    setIsTimerActive(true);
+    setCountdown(timerValue);
 
-  // If image is captured, show preview with retry/next buttons
-  if (capturedImage) {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsTimerActive(false);
+          capturePhoto();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleNextPage = async () => {
+    const imageBlob = capturedBlob || uploadedBlob;
+    if (!imageBlob) {
+      console.log('No image to upload.');
+      return;
+    }
+    try {
+      setIsUploadLoading(true);
+      const file = new File(
+        [imageBlob],
+        capturedBlob ? 'captured-photo.jpg' : 'uploaded-photo.jpg',
+        {
+          type: 'image/jpeg',
+        },
+      );
+
+      let image = await uploadSingleFile(file);
+      setImage(image);
+
+
+      if (stream) {
+        console.log('Stopping camera stream...');
+        stream.getTracks().forEach((track) => track.stop());
+      }
+
+      if (capturedImage) {
+        URL.revokeObjectURL(capturedImage);
+      }
+
+      if (uploadedImage) {
+        URL.revokeObjectURL(uploadedImage);
+      }
+
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setCameraError({
+        label: 'Upload Failed',
+        body: 'There was an error uploading your photo. Please try again.',
+      });
+    } finally {
+      setIsUploadLoading(false);
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Clear any previous errors
+    setCameraError(null);
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setCameraError({
+        label: 'Invalid File Type',
+        body: 'Please select an image file (JPG, PNG, etc.).',
+      });
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setCameraError({
+        label: 'File Too Large',
+        body: 'Please select an image smaller than 10MB.',
+      });
+      return;
+    }
+
+    if (capturedImage) {
+      URL.revokeObjectURL(capturedImage);
+      setCapturedImage(null);
+      setCapturedBlob(null);
+    }
+
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    setUploadedImage(imageUrl);
+    setUploadedBlob(file);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const retakePhoto = async () => {
+    setIsRetaking(true);
+    setCapturedImage(null);
+    setCapturedBlob(null);
+    setUploadedImage(null);
+    setUploadedBlob(null);
+    setCameraError(null);
+
+    if (capturedImage) {
+      URL.revokeObjectURL(capturedImage);
+    }
+
+    if (uploadedImage) {
+      URL.revokeObjectURL(uploadedImage);
+    }
+
+    // Only try to restart camera if permission was previously granted
+    if (cameraPermission === 'granted') {
+      try {
+        await startCamera();
+      } catch (error) {
+        console.error('Error restarting camera:', error);
+      }
+    } else if (cameraPermission === 'denied') {
+      // If camera was denied but user had uploaded image, just clear the upload
+      // and let them choose again
+      setCameraPermission('checking');
+      await startCamera();
+    }
+
+    setIsRetaking(false);
+  };
+
+  if (cameraError && cameraPermission === 'denied') {
     return (
-      <div className="w-full space-y-4">
-        <div className="relative">
-          <img
-            src={capturedImage}
-            alt="Captured"
-            className="w-full h-64 object-cover rounded-lg shadow-md"
-          />
-        </div>
-        
-        <div className="flex gap-3 justify-center">
-          <Button
-            variant="outline"
-            onClick={retryCapture}
-            className="flex items-center gap-2"
+      <section className="animate-appearance-in border border-gray-400/50 rounded-2xl p-5 bg-gray-500/50 backdrop-blur-sm flex flex-col gap-7 m-auto">
+        <div className="mb-8">
+          <div
+            className="relative bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl mx-auto max-w-sm border-4 border-gray-200 flex items-center justify-center"
+            style={{ aspectRatio: '3/4', width: '320px', height: '320px' }}
           >
-            <HiArrowPath className="w-4 h-4" />
-            Retry
-          </Button>
-          
-          <Button
-            onClick={handleNext}
-            className="flex items-center gap-2"
-          >
-            Next
-            <HiArrowRight className="w-4 h-4" />
-          </Button>
+            <div className="text-center text-white p-8">
+              <div className="text-6xl mb-4">📷</div>
+              <h3 className="text-lg font-semibold mb-2">
+                {cameraError.label}
+              </h3>
+              <p className="text-sm text-gray-300 mb-6">{cameraError.body}</p>
+              <Button onClick={startCamera} className="mb-4">
+                Try Again
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Upload option when camera is not available */}
+        <div className="space-y-4">
+          <div className="flex flex-row justify-center">
+            <Button
+              size={"icon"}
+              onClick={handleUploadClick}
+              disabled={isLoading}
+            >
+              <LuUpload />
+            </Button>
+          </div>
+          <div className="text-center text-sm text-gray-300">
+            <p>Upload an image file to continue</p>
+          </div>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          style={{ display: 'none' }}
+        />
+
+        {/* <div className="flex flex-row justify-between items-center">
+          <Button size={"icon"} onClick={GoPrevious}>
+            <MdOutlineKeyboardArrowLeft className="size-7" />
+          </Button>
+        </div> */}
+      </section>
     );
   }
 
-  // Camera interface
   return (
-    <div className="w-full space-y-4">
-      {/* Camera viewport */}
-      <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-video">
-        {isStreaming ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full bg-gray-50">
-            <div className="text-center space-y-2">
-              <HiCamera className="w-12 h-12 mx-auto text-gray-400" />
-              <p className="text-sm text-gray-500">
-                {error ? error : 'Camera not active'}
-              </p>
+    <section className="animate-appearance-in border border-gray-400/50 rounded-2xl p-5 bg-gray-500/50 backdrop-blur-sm w-fit flex flex-col gap-7 m-auto">
+      <div className="mb-8">
+        <div
+          className="relative bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl mx-auto max-w-sm border-4 border-gray-200"
+          style={{ aspectRatio: '3/4', width: '320px', height: '320px' }}
+        >
+          {(isLoading || isRetaking) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-10">
+              <div className="text-center text-white">
+                <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-6"></div>
+                <p className="text-lg font-medium">
+                  {isRetaking
+                    ? 'Restarting camera...'
+                    : 'Preparing your camera...'}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {isTimerActive && countdown > 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20">
+              <div className="text-center text-white">
+                <div className="text-8xl font-bold mb-6">{countdown}</div>
+                <p className="text-2xl font-medium">Get ready...</p>
+              </div>
+            </div>
+          )}
+
+          {capturedImage || uploadedImage ? (
+            <div className="relative w-full h-full">
+              <img
+                src={capturedImage || uploadedImage || ''}
+                alt="Your Amazing Photo"
+                className="w-full h-full object-cover"
+              />
+              {capturedDimensions && (
+                <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                  {capturedDimensions.width} × {capturedDimensions.height}
+                </div>
+              )}
+            </div>
+          ) : cameraPermission === 'denied' ? (
+            <div className="relative w-full h-full flex items-center justify-center bg-gray-800">
+              <div className="text-center text-white p-8">
+                <div className="text-4xl mb-4">📷</div>
+                <p className="text-sm text-gray-300">Camera not available</p>
+                <p className="text-xs text-gray-400 mt-2">
+                  Use upload button below
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="relative w-full h-full">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+                style={{
+                  transform: isMirrored ? 'scaleX(-1)' : 'none',
+                }}
+              />
+              {videoDimensions && (
+                <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                  {videoDimensions.width} × {videoDimensions.height}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex justify-center">
-        {!isStreaming && !error ? (
+      {capturedImage || uploadedImage ? (
+        <div className="flex flex-row gap-5 items-center justify-center">
           <Button
-            onClick={startCamera}
-            disabled={isLoading}
-            className="flex items-center gap-2"
+            size={"icon"}
+            onClick={retakePhoto}
+            disabled={isRetaking}
           >
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Starting...
-              </>
-            ) : (
-              <>
-                <HiCamera className="w-4 h-4" />
-                Start Camera
-              </>
+            <MdOutlineRefresh />
+          </Button>
+          <Button
+            size={"icon"}
+            onClick={handleNextPage}
+            disabled={isUploadLoading}
+          >
+            <LuCheck />
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex flex-row gap-5 items-center justify-center">
+            {/* Upload button first */}
+            <Button
+              size={"icon"}
+              onClick={handleUploadClick}
+              disabled={isTimerActive || isLoading}
+            >
+              <LuUpload />
+            </Button>
+
+            {/* Camera button - only show if camera permission is granted */}
+            {cameraPermission === 'granted' && (
+              <Button
+                size={"icon"}
+                onClick={timerValue > 0 ? startTimerCapture : capturePhoto}
+                disabled={isTimerActive || isLoading}
+              >
+                <LuCamera />
+              </Button>
             )}
-          </Button>
-        ) : isStreaming ? (
-          <Button
-            onClick={capturePhoto}
-            size="lg"
-            className="rounded-full w-16 h-16 p-0"
-          >
-            <div className="w-8 h-8 bg-white rounded-full" />
-          </Button>
-        ) : error ? (
-          <Button
-            onClick={startCamera}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <HiArrowPath className="w-4 h-4" />
-            Try Again
-          </Button>
-        ) : null}
-      </div>
+          </div>
+          <div className="text-center text-sm text-gray-300">
+            <p>
+              {cameraPermission === 'granted'
+                ? 'Upload an image or take a photo with your camera'
+                : cameraPermission === 'checking'
+                  ? 'Checking camera access...'
+                  : 'Upload an image file to continue'}
+            </p>
+          </div>
+        </div>
+      )}
 
-      {/* Hidden canvas for image capture */}
-      <canvas
-        ref={canvasRef}
-        className="hidden"
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        style={{ display: 'none' }}
       />
-    </div>
+
+      <canvas ref={canvasRef} className="hidden" />
+      {/* <div className="flex flex-row justify-between items-center">
+        <Button size={"icon"} onClick={GoPrevious}>
+          <MdOutlineKeyboardArrowLeft className="size-7" />
+        </Button>
+      </div> */}
+    </section>
   );
 }

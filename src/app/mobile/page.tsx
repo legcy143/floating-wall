@@ -153,7 +153,7 @@ export default function Mobile() {
                 </CardFooter>
               </>
             ) : (
-              <Camera />
+              <Camera image={formData.userImage} setImage={(image) => setFormData({ ...formData, userImage: image as string})} />
             )
           }
         </CardContent>
