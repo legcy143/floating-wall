@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LuCamera, LuCheck, LuImagePlus, LuImages, LuSettings, LuUpload } from 'react-icons/lu';
+import { LuCamera, LuCheck, LuImagePlus, LuImages, LuLoader, LuSettings, LuUpload } from 'react-icons/lu';
 import { MdOutlineFlipCameraIos, MdOutlineKeyboardArrowLeft, MdOutlineRefresh } from 'react-icons/md';
 
 
@@ -258,10 +258,10 @@ export default function Camera({ image, setImage }: CameraInterface) {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 15 * 1024 * 1024) {
       setCameraError({
         label: 'File Too Large',
-        body: 'Please select an image smaller than 10MB.',
+        body: 'Please select an image smaller than 15MB.',
       });
       return;
     }
@@ -490,7 +490,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
             variant={"theme"}
             size={"icon"}
             onClick={retakePhoto}
-            disabled={isRetaking}
+            disabled={isRetaking || isUploadLoading}
           >
             <MdOutlineRefresh />
           </Button>
@@ -500,7 +500,9 @@ export default function Camera({ image, setImage }: CameraInterface) {
             onClick={handleNextPage}
             disabled={isUploadLoading}
           >
-            <LuCheck />
+            {
+              isUploadLoading ? <LuLoader className="animate-spin" /> : <LuCheck />
+            }
           </Button>
         </div>
       ) : (
