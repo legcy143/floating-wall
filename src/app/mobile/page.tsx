@@ -10,6 +10,7 @@ import { API_URL } from "@/constant/API_URL";
 import Camera from "./_components/Camera";
 import BackGroundWrapper from "./_components/BackGroundWrapper";
 import Form from "./_components/Form";
+import { MdDone, MdDoneAll } from "react-icons/md";
 
 const socket = io(API_URL, {
   transports: ["websocket"],
@@ -57,15 +58,19 @@ export default function Mobile() {
       `${API_URL}/floating-wall`,
       formData
     );
-    // toast.success("Feedback shared successfully");
     setisSubmited(true)
-    setFormData({ ...initialData });
   };
 
   if (isSubmited) {
     return (
       <BackGroundWrapper>
-        <p>Your response recorded</p>
+        <section className="flex flex-col gap-5  py-5 items-center justify-center">
+          <div className="bg-pink-400 p-5 rounded-full text-white">
+            <MdDoneAll size={25} />
+          </div>
+          <p className="font-bold text-xl">Thank you, {formData.name}!</p>
+          <p className="text-center p-1">Your lantern has been lit on the big screen.</p>
+        </section>
       </BackGroundWrapper>
     )
   }
@@ -73,7 +78,7 @@ export default function Mobile() {
   if (!formData.userImage) {
     return (
       <BackGroundWrapper>
-       <p className="text-center">Light Your Lamp – Upload Your Photo</p>
+        <p className="text-center">Light Your Lamp – Upload Your Photo</p>
         <Camera image={formData.userImage} setImage={(image) => handleOnChange("userImage", image as string)} />
       </BackGroundWrapper>
     );

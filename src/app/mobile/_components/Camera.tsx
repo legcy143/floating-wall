@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LuCamera, LuCameraOff, LuCheck, LuImagePlus, LuImages, LuLoader, LuSettings } from 'react-icons/lu';
+import { LuCamera, LuCameraOff, LuImages, LuLoader } from 'react-icons/lu';
 import { MdOutlineFlipCameraIos, MdOutlineKeyboardArrowLeft, MdOutlineRefresh } from 'react-icons/md';
 
 
@@ -385,7 +385,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
               onClick={handleUploadClick}
               disabled={isLoading}
             >
-              <LuImages />
+              <LuImages size={20} />
             </Button>
           </div>
           {/* <div className="text-center text-sm text-gray-300">
@@ -510,7 +510,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
               onClick={handleUploadClick}
               disabled={isTimerActive || isLoading}
             >
-              <LuImages />
+              <LuImages size={20} />
             </Button>
 
             {cameraPermission === 'granted' && (
@@ -530,7 +530,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
                   onClick={handleToggle}
                   disabled={isTimerActive || isLoading}
                 >
-                  <MdOutlineFlipCameraIos />
+                  <MdOutlineFlipCameraIos size={20}/>
                 </Button>
               </>
             )}

@@ -29,7 +29,7 @@ export default function Form({ formData, handleOnChange, handleSubmit, maxLength
                     className="px-14 gap-2 text-white bg-[#3f0653]"
                     onClick={handleSubmit}
                 >
-                    Share
+                     🪔 Light My Lamp
                 </Button>
             </CardFooter>
         </>
