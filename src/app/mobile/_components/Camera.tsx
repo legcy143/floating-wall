@@ -101,10 +101,10 @@ export default function Camera({ image, setImage }: CameraInterface) {
 
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 320 },
-          height: { ideal: 320 },
+          width: { ideal: 280 },
+          height: { ideal: 373 },
           facingMode: facingMode,
-          aspectRatio: { ideal: 1 / 1 },
+          aspectRatio: { ideal: 3 / 4 },
         },
       });
 
@@ -305,10 +305,10 @@ export default function Camera({ image, setImage }: CameraInterface) {
       setIsLoading(true);
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 320 },
-          height: { ideal: 320 },
+          width: { ideal: 280 },
+          height: { ideal: 373 },
           facingMode: newFacingMode,
-          aspectRatio: { ideal: 1 / 1 },
+          aspectRatio: { ideal: 3 / 4 },
         },
       });
 
@@ -358,11 +358,11 @@ export default function Camera({ image, setImage }: CameraInterface) {
 
   if (cameraError && cameraPermission === 'denied') {
     return (
-      <section className="animate-appearance-in border border-gray-400/50 rounded-2xl p-5 bg-gray-500/50 backdrop-blur-sm flex flex-col gap-7 m-auto">
-        <div className="mb-8">
+      <section className="animate-appearance-in rounded-2xl p-3 flex flex-col gap-4 w-full max-w-xs mx-auto">
+        <div className="w-full">
           <div
-            className="relative bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl mx-auto max-w-sm border-4 border-gray-200 flex items-center justify-center"
-            style={{ aspectRatio: '3/4', width: '320px', height: '320px' }}
+            className="relative rounded-3xl overflow-hidden shadow-2xl mx-auto w-full flex items-center justify-center"
+            style={{ aspectRatio: '3/4', maxWidth: '280px' }}
           >
             <div className="text-center text-white p-8">
               <div className="text-6xl mb-4">📷</div>
@@ -411,16 +411,15 @@ export default function Camera({ image, setImage }: CameraInterface) {
   }
 
   return (
-    <section className="animate-appearance-in border border-gray-400/50 rounded-2xl p-5 bg-gray-500/50 backdrop-blur-sm w-fit flex flex-col gap-7 m-auto">
-      <div className="mb-8">
+    <section className="animate-appearance-in rounded-2xl p-3 w-full max-w-xs mx-auto flex flex-col gap-4">
+      <div className="w-full">
         <div
-          className="relative bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl mx-auto max-w-sm border-4 border-gray-200"
-          style={{ aspectRatio: '3/4', width: '320px', height: '320px' }}
+          className="relative rounded-3xl overflow-hidden shadow-2xl mx-auto w-full"
+          style={{ aspectRatio: '3/4', maxWidth: '280px' }}
         >
           {(isLoading || isRetaking) && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-10">
               <div className="text-center text-white">
-                <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-6"></div>
                 <p className="text-lg font-medium">
                   {isRetaking
                     ? 'Restarting camera...'
@@ -453,7 +452,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
               )}
             </div>
           ) : cameraPermission === 'denied' ? (
-            <div className="relative w-full h-full flex items-center justify-center bg-gray-800">
+            <div className="relative w-full h-full flex items-center justify-center">
               <div className="text-center text-white p-8">
                 <div className="text-4xl mb-4">📷</div>
                 <p className="text-sm text-gray-300">

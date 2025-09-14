@@ -89,10 +89,10 @@ export default function Mobile() {
         backgroundPosition: "center",
       }}
     >
+      <section className="flex gap-5 w-full max-w-[30rem] flex-col items-center">
+        <img src={Logo.src} alt="logo" className="w-44" />
       <Card className="w-[90%] max-w-[25rem] m-auto z-10">
-        <CardContent className="p-3 flex justify-center items-center flex-col space-y-3">
-          <img src={Logo.src} alt="logo" className="w-44" />
-
+        <CardContent className="p-5 flex justify-center items-center flex-col space-y-3">
           {/* content goes here */}
           {
             formData.userImage ? (
@@ -153,11 +153,15 @@ export default function Mobile() {
                 </CardFooter>
               </>
             ) : (
+              <>
+              <p>Light Your Lamp – Upload Your Photo</p>
               <Camera image={formData.userImage} setImage={(image) => setFormData({ ...formData, userImage: image as string})} />
+              </>
             )
           }
         </CardContent>
       </Card>
+      </section>
     </main>
   );
 }
