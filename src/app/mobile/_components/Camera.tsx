@@ -361,7 +361,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
       <section className="animate-appearance-in rounded-2xl p-3 flex flex-col gap-4 w-full max-w-xs mx-auto">
         <div className="w-full">
           <div
-            className="relative rounded-3xl overflow-hidden shadow-2xl mx-auto w-full flex items-center justify-center"
+            className="relative rounded-3xl overflow-hidden shadow-xl border  mx-auto w-full flex items-center justify-center"
             style={{ aspectRatio: '3/4', maxWidth: '280px' }}
           >
             <div className="text-center text-white p-8">
@@ -414,7 +414,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
     <section className="animate-appearance-in rounded-2xl p-3 w-full max-w-xs mx-auto flex flex-col gap-4">
       <div className="w-full">
         <div
-          className="relative rounded-3xl overflow-hidden shadow-2xl mx-auto w-full"
+          className="relative rounded-3xl overflow-hidden  shadow-xl border  mx-auto w-full"
           style={{ aspectRatio: '3/4', maxWidth: '280px' }}
         >
           {(isLoading || isRetaking) && (
@@ -483,20 +483,22 @@ export default function Camera({ image, setImage }: CameraInterface) {
       </div>
 
       {capturedImage || uploadedImage ? (
-        <div className="flex flex-row gap-5 items-center justify-center">
+        <div className="flex flex-row  gap-5 items-center justify-center">
           <Button
             variant={"outline"}
+            className='border-[#3f0653]'
             onClick={retakePhoto}
             disabled={isRetaking || isUploadLoading}
           >
-            Retry
+            Retake
           </Button>
           <Button
             onClick={handleNextPage}
             disabled={isUploadLoading}
+            className='bg-[#3f0653]'
           >
             {
-              isUploadLoading && <LuLoader className="animate-spin" />
+              isUploadLoading && <LuLoader className="animate-spin text-white" />
             }
             continue
           </Button>

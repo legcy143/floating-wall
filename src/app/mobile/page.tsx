@@ -11,6 +11,8 @@ import Camera from "./_components/Camera";
 import BackGroundWrapper from "./_components/BackGroundWrapper";
 import Form from "./_components/Form";
 import { MdDone, MdDoneAll } from "react-icons/md";
+import { CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const socket = io(API_URL, {
   transports: ["websocket"],
@@ -32,6 +34,7 @@ const initialData: FormDataTypes = {
 export default function Mobile() {
   const [formData, setFormData] = useState<FormDataTypes>({ ...initialData });
   const [isSubmited, setisSubmited] = useState(false)
+  const [isLoading, setisLoading] = useState(false)
 
   let maxLength = {
     name: 10,
@@ -48,17 +51,24 @@ export default function Mobile() {
   }
 
   const handleSubmit = async () => {
-    if (formData.name.length === 0 || formData.feedback.length === 0) {
-      toast.warning("All fields are required");
-      return;
-    }
+    try {
+      setisLoading(true);
+      if (formData.name.length === 0 || formData.feedback.length === 0) {
+        toast.warning("All fields are required");
+        return;
+      }
 
-    socket.emit("wall", formData);
-    await axios.post(
-      `${API_URL}/floating-wall`,
-      formData
-    );
-    setisSubmited(true)
+      socket.emit("wall", formData);
+      await axios.post(
+        `${API_URL}/floating-wall`,
+        formData
+      );
+      setisSubmited(true);
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setisLoading(false);
+    }
   };
 
   if (isSubmited) {
@@ -86,7 +96,16 @@ export default function Mobile() {
 
   return (
     <BackGroundWrapper>
-      <Form formData={formData} handleOnChange={handleOnChange} handleSubmit={handleSubmit} maxLength={maxLength} />
+      <Form formData={formData} isLoading={isLoading} handleOnChange={handleOnChange} handleSubmit={handleSubmit} maxLength={maxLength} />
+      <CardFooter className="flex flex-row items-center justify-center gap-2 py-2">
+        <Button
+          disabled={isLoading}
+          className="px-14 gap-2 text-white bg-[#3f0653]"
+          onClick={handleSubmit}
+        >
+          🪔 Light My Lamp
+        </Button>
+      </CardFooter>
     </BackGroundWrapper>
   )
 }
