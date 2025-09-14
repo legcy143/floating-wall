@@ -19,17 +19,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import React, { useEffect, useRef, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { IoIosSend } from "react-icons/io";
 
 import io from "socket.io-client";
 import { TiArrowSortedDown } from "react-icons/ti";
 import feedbackOptions from "@/utils/feedbackOptions";
 import axios from "axios";
 import { API_URL } from "@/constant/API_URL";
+import Camera from "./_components/Camera";
 
 const socket = io(API_URL, {
   transports: ["websocket"],
@@ -41,12 +39,15 @@ interface FormDataTypes {
   userImage: string;
 }
 
+const initialData: FormDataTypes = {
+  name: "",
+  feedback: feedbackOptions[0],
+  // userImage: "https://cdn-images.quenth.com/c5c9b77f-260e-481a-9906-80bfd29af005_Women-2.png",
+  userImage: "",
+};
+
 export default function Mobile() {
-  const [formData, setFormData] = useState<FormDataTypes>({
-    name: "",
-    feedback: feedbackOptions[0],
-    userImage:"https://cdn-images.quenth.com/c5c9b77f-260e-481a-9906-80bfd29af005_Women-2.png",
-  });
+  const [formData, setFormData] = useState<FormDataTypes>({ ...initialData });
 
   let maxLength = {
     name: 10,
@@ -74,11 +75,7 @@ export default function Mobile() {
       formData
     );
     toast.success("Feedback shared successfully");
-    setFormData({
-      name: "",
-      feedback: feedbackOptions[0],
-      userImage:"",
-    });
+    setFormData({ ...initialData });
   };
 
   return (
@@ -95,61 +92,70 @@ export default function Mobile() {
       <Card className="w-[90%] max-w-[25rem] m-auto z-10">
         <CardContent className="p-3 flex justify-center items-center flex-col space-y-3">
           <img src={Logo.src} alt="logo" className="w-44" />
-          <section className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <Label className="w-20">
-                Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                className="flex-1"
-                placeholder=". . ."
-                value={formData.name}
-                onChange={(e) => handleOnChange("name", e.target.value)}
-              />
-            </div>
-            <span className="text-xs text-end w-full block ml-0 mt-[-0.7rem]">
-              {formData.name.length}/{maxLength.name}
-            </span>
 
-            <div className="flex items-center gap-2">
-              <Label className=" w-20">I'm Feeling </Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className=" flex-1 justify-between">
-                    {formData.feedback}
-                    <TiArrowSortedDown className="ml-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full h-full flex-1">
-                  <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup
-                    className="p-2 max-h-[35vh] overflow-y-auto"
-                    defaultValue={formData.feedback}
-                    onValueChange={(e) => {
-                      handleOnChange("feedback", e);
-                      console.log(e);
-                    }}
-                  >
-                    {feedbackOptions?.map((e) => (
-                      <DropdownMenuRadioItem key={e} value={e}>
-                        {e}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </section>
           {/* content goes here */}
-          <CardFooter className="flex flex-row items-center justify-center gap-2 py-2 pt-7">
-            <Button
-              className="px-14 gap-2 text-white bg-[#3f0653]"
-              onClick={handleSubmit}
-            >
-              Share
-            </Button>
-          </CardFooter>
+          {
+            formData.userImage ? (
+              <>
+                <section className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <Label className="w-20">
+                      Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      className="flex-1"
+                      placeholder=". . ."
+                      value={formData.name}
+                      onChange={(e) => handleOnChange("name", e.target.value)}
+                    />
+                  </div>
+                  <span className="text-xs text-end w-full block ml-0 mt-[-0.7rem]">
+                    {formData.name.length}/{maxLength.name}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <Label className=" w-20">I'm Feeling </Label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className=" flex-1 justify-between">
+                          {formData.feedback}
+                          <TiArrowSortedDown className="ml-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-full h-full flex-1">
+                        <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuRadioGroup
+                          className="p-2 max-h-[35vh] overflow-y-auto"
+                          defaultValue={formData.feedback}
+                          onValueChange={(e) => {
+                            handleOnChange("feedback", e);
+                            console.log(e);
+                          }}
+                        >
+                          {feedbackOptions?.map((e) => (
+                            <DropdownMenuRadioItem key={e} value={e}>
+                              {e}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </section>
+                <CardFooter className="flex flex-row items-center justify-center gap-2 py-2 pt-7">
+                  <Button
+                    className="px-14 gap-2 text-white bg-[#3f0653]"
+                    onClick={handleSubmit}
+                  >
+                    Share
+                  </Button>
+                </CardFooter>
+              </>
+            ) : (
+              <Camera />
+            )
+          }
         </CardContent>
       </Card>
     </main>
