@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LuCamera, LuCheck, LuImagePlus, LuImages, LuLoader, LuSettings, LuUpload } from 'react-icons/lu';
+import { LuCamera, LuCameraOff, LuCheck, LuImagePlus, LuImages, LuLoader, LuSettings } from 'react-icons/lu';
 import { MdOutlineFlipCameraIos, MdOutlineKeyboardArrowLeft, MdOutlineRefresh } from 'react-icons/md';
 
 
@@ -8,7 +8,7 @@ import { uploadSingleFile } from '@/utils/upload';
 
 interface CameraInterface {
   image: string | null;
-  setImage: React.Dispatch<React.SetStateAction<string | null>>;
+  setImage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function Camera({ image, setImage }: CameraInterface) {
@@ -296,11 +296,11 @@ export default function Camera({ image, setImage }: CameraInterface) {
     const newFacingMode = facingMode === 'user' ? 'environment' : 'user';
     setFacingMode(newFacingMode);
     setIsMirrored(newFacingMode === 'user');
-    
+
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
-    
+
     try {
       setIsLoading(true);
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -313,7 +313,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
       });
 
       setStream(mediaStream);
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
@@ -369,7 +369,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
               <h3 className="text-lg font-semibold mb-2">
                 {cameraError.label}
               </h3>
-              <p className="text-sm text-gray-300 mb-6">{cameraError.body}</p>
+              <p className="text-sm opacity-70 mb-6">{cameraError.body}</p>
               <Button onClick={startCamera} className="mb-4">
                 Try Again
               </Button>
@@ -385,12 +385,12 @@ export default function Camera({ image, setImage }: CameraInterface) {
               onClick={handleUploadClick}
               disabled={isLoading}
             >
-              <LuUpload />
+              <LuImages />
             </Button>
           </div>
-          <div className="text-center text-sm text-gray-300">
+          {/* <div className="text-center text-sm text-gray-300">
             <p>Upload an image file to continue</p>
-          </div>
+          </div> */}
         </div>
 
         <input
@@ -454,12 +454,9 @@ export default function Camera({ image, setImage }: CameraInterface) {
           ) : cameraPermission === 'denied' ? (
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="text-center text-white p-8">
-                <div className="text-4xl mb-4">📷</div>
-                <p className="text-sm text-gray-300">
-                  Unable to access the camera. Please verify your settings and grant the necessary permissions.
-                </p>
-                <p className="text-xs text-gray-400 mt-2">
-                   If you're having trouble with the camera, use the button below to upload an image instead.
+                <LuCameraOff className='text-4xl mb-4 text-center mx-auto'/>
+                <p className="text-sm ">
+                  Unable to access the camera. Please verify your settings and grant the necessary permissions. or use the upload option below.
                 </p>
               </div>
             </div>
@@ -488,22 +485,20 @@ export default function Camera({ image, setImage }: CameraInterface) {
       {capturedImage || uploadedImage ? (
         <div className="flex flex-row gap-5 items-center justify-center">
           <Button
-            variant={"theme"}
-            size={"icon"}
+            variant={"outline"}
             onClick={retakePhoto}
             disabled={isRetaking || isUploadLoading}
           >
-            <MdOutlineRefresh />
+            Retry
           </Button>
           <Button
-            variant={"theme"}
-            size={"icon"}
             onClick={handleNextPage}
             disabled={isUploadLoading}
           >
             {
-              isUploadLoading ? <LuLoader className="animate-spin" /> : <LuCheck />
+              isUploadLoading && <LuLoader className="animate-spin" />
             }
+            continue
           </Button>
         </div>
       ) : (
@@ -539,15 +534,6 @@ export default function Camera({ image, setImage }: CameraInterface) {
                 </Button>
               </>
             )}
-          </div>
-          <div className="text-center text-sm text-gray-300">
-            <p>
-              {cameraPermission === 'granted'
-                ? 'Upload an image or take a photo with your camera'
-                : cameraPermission === 'checking'
-                  ? 'Checking camera access...'
-                  : 'Upload an image file to continue'}
-            </p>
           </div>
         </div>
       )}

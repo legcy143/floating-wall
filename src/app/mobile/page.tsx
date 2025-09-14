@@ -1,25 +1,5 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Logo from "../../../public/assets/logo.png";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
 import io from "socket.io-client";
@@ -28,6 +8,8 @@ import feedbackOptions from "@/utils/feedbackOptions";
 import axios from "axios";
 import { API_URL } from "@/constant/API_URL";
 import Camera from "./_components/Camera";
+import BackGroundWrapper from "./_components/BackGroundWrapper";
+import Form from "./_components/Form";
 
 const socket = io(API_URL, {
   transports: ["websocket"],
@@ -48,6 +30,7 @@ const initialData: FormDataTypes = {
 
 export default function Mobile() {
   const [formData, setFormData] = useState<FormDataTypes>({ ...initialData });
+  const [isSubmited, setisSubmited] = useState(false)
 
   let maxLength = {
     name: 10,
@@ -74,94 +57,31 @@ export default function Mobile() {
       `${API_URL}/floating-wall`,
       formData
     );
-    toast.success("Feedback shared successfully");
+    // toast.success("Feedback shared successfully");
+    setisSubmited(true)
     setFormData({ ...initialData });
   };
 
-  return (
-    <main
-      className="w-screen max-h-[100vh] h-[100dvh] flex justify-center items-center"
-      style={{
-        backgroundImage: "url(./assets/bg.png)",
-        backgroundOrigin: "center center",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <section className="flex gap-5 w-full max-w-[30rem] flex-col items-center">
-        <img src={Logo.src} alt="logo" className="w-44" />
-      <Card className="w-[90%] max-w-[25rem] m-auto z-10">
-        <CardContent className="p-5 flex justify-center items-center flex-col space-y-3">
-          {/* content goes here */}
-          {
-            formData.userImage ? (
-              <>
-                <section className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <Label className="w-20">
-                      Name <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      className="flex-1"
-                      placeholder=". . ."
-                      value={formData.name}
-                      onChange={(e) => handleOnChange("name", e.target.value)}
-                    />
-                  </div>
-                  <span className="text-xs text-end w-full block ml-0 mt-[-0.7rem]">
-                    {formData.name.length}/{maxLength.name}
-                  </span>
+  if (isSubmited) {
+    return (
+      <BackGroundWrapper>
+        <p>Your response recorded</p>
+      </BackGroundWrapper>
+    )
+  }
 
-                  <div className="flex items-center gap-2">
-                    <Label className=" w-20">I'm Feeling </Label>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className=" flex-1 justify-between">
-                          {formData.feedback}
-                          <TiArrowSortedDown className="ml-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-full h-full flex-1">
-                        <DropdownMenuLabel>I am Feeling</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuRadioGroup
-                          className="p-2 max-h-[35vh] overflow-y-auto"
-                          defaultValue={formData.feedback}
-                          onValueChange={(e) => {
-                            handleOnChange("feedback", e);
-                            console.log(e);
-                          }}
-                        >
-                          {feedbackOptions?.map((e) => (
-                            <DropdownMenuRadioItem key={e} value={e}>
-                              {e}
-                            </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </section>
-                <CardFooter className="flex flex-row items-center justify-center gap-2 py-2 pt-7">
-                  <Button
-                    className="px-14 gap-2 text-white bg-[#3f0653]"
-                    onClick={handleSubmit}
-                  >
-                    Share
-                  </Button>
-                </CardFooter>
-              </>
-            ) : (
-              <>
-              <p>Light Your Lamp – Upload Your Photo</p>
-              <Camera image={formData.userImage} setImage={(image) => setFormData({ ...formData, userImage: image as string})} />
-              </>
-            )
-          }
-        </CardContent>
-      </Card>
-      </section>
-    </main>
-  );
+  if (!formData.userImage) {
+    return (
+      <BackGroundWrapper>
+       <p className="text-center">Light Your Lamp – Upload Your Photo</p>
+        <Camera image={formData.userImage} setImage={(image) => handleOnChange("userImage", image as string)} />
+      </BackGroundWrapper>
+    );
+  }
+
+  return (
+    <BackGroundWrapper>
+      <Form formData={formData} handleOnChange={handleOnChange} handleSubmit={handleSubmit} maxLength={maxLength} />
+    </BackGroundWrapper>
+  )
 }
