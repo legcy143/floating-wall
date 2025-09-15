@@ -83,7 +83,7 @@ export default function Page() {
             <Label>Total send data count : {currentCount}</Label>
             <Button disabled={isLoading || total === 0} onClick={handleSubmit}>
                 {
-                    isLoading ? `Submitting ${currentCount} / ${total}` : `Submit ${total} data`
+                    isLoading ? `Submitting ${total}` : `Submit ${total} data`
                 }
             </Button>
 
