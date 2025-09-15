@@ -8,7 +8,7 @@ import { uploadSingleFile } from '@/utils/upload';
 
 interface CameraInterface {
   image: string | null;
-  setImage: React.Dispatch<React.SetStateAction<string>>;
+  setImage: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function Camera({ image, setImage }: CameraInterface) {
@@ -129,43 +129,61 @@ export default function Camera({ image, setImage }: CameraInterface) {
     const video = videoRef.current;
     const context = canvas.getContext('2d');
 
-    const displayWidth = video.clientWidth;
-    const displayHeight = video.clientHeight;
-
-    canvas.width = displayWidth;
-    canvas.height = displayHeight;
+    // Use the container's dimensions (what user actually sees)
+    const containerWidth = 280; // max width from our container
+    const containerHeight = Math.round(containerWidth * (4/3)); // 3:4 aspect ratio
+    
+    // Set canvas to match visible area
+    canvas.width = containerWidth;
+    canvas.height = containerHeight;
     setCapturedDimensions({
-      width: displayWidth,
-      height: displayHeight,
+      width: containerWidth,
+      height: containerHeight,
     });
 
     if (context) {
+      // Calculate video scaling to fit container while maintaining aspect ratio
+      const videoAspect = video.videoWidth / video.videoHeight;
+      const containerAspect = containerWidth / containerHeight;
+      
+      let sourceX = 0, sourceY = 0, sourceWidth = video.videoWidth, sourceHeight = video.videoHeight;
+      
+      if (videoAspect > containerAspect) {
+        // Video is wider, crop sides
+        sourceWidth = video.videoHeight * containerAspect;
+        sourceX = (video.videoWidth - sourceWidth) / 2;
+      } else {
+        // Video is taller, crop top/bottom
+        sourceHeight = video.videoWidth / containerAspect;
+        sourceY = (video.videoHeight - sourceHeight) / 2;
+      }
+
       if (isMirrored) {
         context.save();
         context.scale(-1, 1);
         context.drawImage(
           video,
+          sourceX,
+          sourceY,
+          sourceWidth,
+          sourceHeight,
+          -containerWidth,
           0,
-          0,
-          displayWidth,
-          displayHeight,
-          -displayWidth,
-          0,
-          displayWidth,
-          displayHeight,
+          containerWidth,
+          containerHeight,
         );
         context.restore();
       } else {
         context.drawImage(
           video,
+          sourceX,
+          sourceY,
+          sourceWidth,
+          sourceHeight,
           0,
           0,
-          displayWidth,
-          displayHeight,
-          0,
-          0,
-          displayWidth,
-          displayHeight,
+          containerWidth,
+          containerHeight,
         );
       }
 
@@ -361,7 +379,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
       <section className="animate-appearance-in rounded-2xl p-3 flex flex-col gap-4 w-full max-w-xs mx-auto">
         <div className="w-full">
           <div
-            className="relative rounded-3xl overflow-hidden shadow-xl border  mx-auto w-full flex items-center justify-center"
+            className="relative rounded-3xl overflow-hidden shadow-xl mx-auto w-full flex items-center justify-center"
             style={{ aspectRatio: '3/4', maxWidth: '280px' }}
           >
             <div className="text-center text-white p-8">
@@ -414,7 +432,7 @@ export default function Camera({ image, setImage }: CameraInterface) {
     <section className="animate-appearance-in rounded-2xl p-3 w-full max-w-xs mx-auto flex flex-col gap-4">
       <div className="w-full">
         <div
-          className="relative rounded-3xl overflow-hidden  shadow-xl border  mx-auto w-full"
+          className="relative rounded-3xl overflow-hidden shadow-xl mx-auto w-full"
           style={{ aspectRatio: '3/4', maxWidth: '280px' }}
         >
           {(isLoading || isRetaking) && (
