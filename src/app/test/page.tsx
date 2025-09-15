@@ -26,7 +26,7 @@ export default function Page() {
     const [total, setTotal] = useState<number>(0)
     const [isLoading, setisLoading] = useState(false)
 
-    const submit = async () => {
+    const submit = async (formData:any) => {
         socket.emit("wall", formData);
         await axios.post(
             `${API_URL}/floating-wall`,
@@ -41,7 +41,8 @@ export default function Page() {
                 return;
             }
             for (let i = 0; i < total; i++) {
-                await submit();
+                formData.name = `testing - ${i+1}`
+                await submit(formData);
                 setCurrentCount((prev) => prev + 1)
             }
             toast.success("All data submitted successfully");
@@ -80,7 +81,7 @@ export default function Page() {
                 onChange={(e) => setTotal(Number(e.target.value))}
             />
             <Label>Total send data count : {currentCount}</Label>
-            <Button disabled={isLoading || currentCount === total} onClick={handleSubmit}>
+            <Button disabled={isLoading || total === 0} onClick={handleSubmit}>
                 {
                     isLoading ? `Submitting ${currentCount} / ${total}` : `Submit ${total} data`
                 }
