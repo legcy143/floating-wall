@@ -15,10 +15,11 @@ const Page: React.FC = () => {
   const [lamps, setLamps] = useState<any>([]);
   const [showWelcome, setShowWelcome] = useState(false);
   const [renderIndex, setRenderIndex] = useState(0);
+  const [socketQueue, setSocketQueue] = useState<any[]>([]);
 
   useEffect(() => {
     const handleWallEvent = (data: any) => {
-      setLamps((prevLamps: any) => [...prevLamps, data]);
+      setSocketQueue((prevQueue: any) => [...prevQueue, data]);
     };
 
     socket.on("wall", handleWallEvent);
@@ -58,12 +59,18 @@ const Page: React.FC = () => {
   useEffect(() => {
     if (!showWelcome) {
       const timeout = setTimeout(() => {
-        setRenderIndex((prevIndex) => prevIndex + 1);
+        if (socketQueue.length > 0) {
+          setLamps((prevLamps: any) => [...prevLamps, socketQueue[0]]);
+          setSocketQueue((prevQueue: any) => prevQueue.slice(1));
+          setRenderIndex((prevIndex) => prevIndex + 1);
+        } else if (renderIndex < lamps.length) {
+          setRenderIndex((prevIndex) => prevIndex + 1);
+        }
       }, 1000);
 
       return () => clearTimeout(timeout);
     }
-  }, [renderIndex, showWelcome]);
+  }, [renderIndex, showWelcome, lamps.length, socketQueue]);
 
   return (
     <div className="flex justify-center items-center h-screen bg-cover bg-[url('/assets/bg.png')] relative overflow-hidden">
