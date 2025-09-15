@@ -52,7 +52,7 @@ export default function Lamp(data: LampProps) {
   return (
     <div
       ref={divRef}
-      className="absolute text-white bottom-[-45vh]  flex flex-col justify-center items-center bg-cover h-[8rem] w-[6.5rem]"
+      className="absolute text-white bottom-[-45vh]  flex flex-col justify-center items-center bg-cover h-[12rem] w-[9.7rem]"
       style={{
         backgroundImage: `url(${lampImages[0]})`,
         left: `${randomXaxis()}vw`,
@@ -61,7 +61,7 @@ export default function Lamp(data: LampProps) {
       <div className="mb-8 flex flex-col justify-center items-center">
      
         {
-          data.userImage && <img src={data.userImage} className="size-[2.5rem] rounded-full object-cover mb-1" alt="User" />
+          data.userImage && <img src={data.userImage} className="size-[5rem] rounded-full object-cover mb-1" alt="User" />
         }
         <p className="text-white tracking-wider text-[13px] font-bold text-clip">
           {data.name?.toUpperCase()}
