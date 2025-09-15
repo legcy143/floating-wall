@@ -33,25 +33,10 @@ const Page: React.FC = () => {
     const getLamps = async () => {
       const res = await axios.get(`${API_URL}/floating-wall`);
       setLamps(res.data);
-      console.log(res.data);
+      setRenderIndex(0); // Start from 0 so lamps reveal one-by-one
     };
 
     getLamps();
-
-    // let timer: NodeJS.Timeout;
-
-    // timer = setInterval(() => {
-    //   const randomLamps = Array.from({ length: 2 }, () => ({
-    //     name: "",
-    //     feedback:
-    //       feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)],
-    //   }));
-    //   setLamps((prevLamps: any) => [...prevLamps, ...randomLamps]);
-    // }, 10000);
-
-    // return () => {
-    //   clearTimeout(timer);
-    // };
   }, []);
 
   useEffect(() => {
