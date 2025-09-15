@@ -72,7 +72,8 @@ export default function Page() {
     }
 
     return (
-        <div className='flex flex-col gap-4 p-4 max-w-xs m-auto'>
+        <div className='flex flex-col gap-4 p-4 max-w-xs m-auto pt-[5rem]'>
+            <p className='text-center font-bold text-2xl my-5'>TEST</p>
             <Input
                 type="text"
                 value={total}
